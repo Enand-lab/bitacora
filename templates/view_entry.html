@@ -1,0 +1,151 @@
+<!-- templates/view_entry.html -->
+<!DOCTYPE html>
+<html lang="es">
+<style>
+    /* Estilos para contenido Markdown */
+    .entry-text p {
+        margin: 0.5rem 0;
+        line-height: 1.5;
+    }
+    .entry-text ul,
+    .entry-text ol {
+        margin: 0.5rem 0 0.5rem 1.5rem;
+        padding: 0;
+    }
+    .entry-text li {
+        margin: 0.25rem 0;
+        line-height: 1.4;
+    }
+    .entry-text h1,
+    .entry-text h2,
+    .entry-text h3 {
+        margin: 1rem 0 0.5rem;
+        font-weight: bold;
+    }
+    .entry-text blockquote {
+        margin: 0.5rem 0;
+        padding: 0.5rem 1rem;
+        border-left: 4px solid #ddd;
+        color: #666;
+        font-style: italic;
+    }
+    .entry-text code {
+        background: #f4f4f4;
+        padding: 0.1rem 0.3rem;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 0.9em;
+    }
+</style>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+  <meta name="theme-color" content="#1e56a0">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='icons/icon-512.png') }}">
+  
+  <title>{{ t.view_entry_title }} – {{ t.app_title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+  <style>
+    main { max-width: 800px; margin: 0 auto; padding: 1rem 0; }
+    .entry-detail { padding: 1rem; background: #f9fbfd; border-radius: 6px; margin-bottom: 1rem; }
+    .entry-image { margin: 1rem 0; text-align: center; }
+    .entry-image img { max-width: 100%; height: auto; max-height: 60vh; border-radius: 4px; }
+    .meta-row { display: flex; margin: 0.4rem 0; }
+    .meta-label { font-weight: bold; min-width: 140px; color: #444; }
+    .meta-value { flex: 1; color: #222; }
+    .nav-back {
+      display: inline-flex;
+      align-items: center;
+      text-decoration: none;
+      margin-bottom: 1rem;
+      color: #1e56a0;
+    }
+    .nav-back:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f9fbfd; border-bottom: 1px solid #eee;">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <img src="{{ url_for('static', filename='icons/logo-derrotero.png') }}" alt="Cuaderno de Bitácora" style="height: 60px; width: auto; object-fit: contain;">
+        <h1 style="margin: 0; font-size: 1.2rem;">{{ t.view_entry_title }}</h1>
+         <a href="/" title="{{ t.cancel_button }}">
+            <img src="{{ url_for('static', filename='icons/house.svg') }}" alt="Editar" style="width: 36px; height: 36px; vertical-align: middle; padding-left: 0.5rem;">
+         </a>
+    </div>
+    
+    
+  </header>
+
+  <main class="container">
+    <div class="entry-detail">
+      <div class="meta-row">
+        <span class="meta-label">{{ t.date_time_label }}:</span>
+        <span class="meta-value">{{ formatted_date }}</span>
+      </div>
+      {% if entry.entry_type %}
+      <div class="meta-row">
+        <span class="meta-label">{{ t.entry_type_label }}:</span>
+        <span class="meta-value">{{ t['entry_type_' + entry.entry_type] or entry.entry_type }}</span>
+      </div>
+      {% endif %}
+      {% if entry.navigation_state %}
+      <div class="meta-row">
+        <span class="meta-label">{{ t.navigation_state_label }}:</span>
+        <span class="meta-value">{{ t['nav_state_' + entry.navigation_state] or entry.navigation_state }}</span>
+      </div>
+      {% endif %}
+      {% if entry.latitude and entry.longitude %}
+      <div class="meta-row">
+        <span class="meta-label">{{ t.position_label }}:</span>
+        <span class="meta-value">
+          {{ "%.4f" | format(entry.latitude) }}, {{ "%.4f" | format(entry.longitude) }}
+          <a href="https://www.openstreetmap.org/?mlat={{ entry.latitude }}&mlon={{ entry.longitude }}&zoom=14" target="_blank">🗺️</a>
+        </span>
+      </div>
+      {% endif %}
+      <div class="meta-row">
+        <span class="meta-label">{{ t.source_label }}:</span>
+        <span class="meta-value">{{ entry.source }}</span>
+      </div>
+    </div>
+
+    <h3>{{ t.note_label }}</h3>
+    {{ entry.text_html | safe }}
+
+    {% if entry.media_path %}
+    <div class="entry-image">
+      <a href="/{{ entry.media_path }}" target="_blank">
+        <img src="/{{ entry.media_path }}" alt="{{ t.attached_image }}">
+      </a>
+    </div>
+    {% endif %}
+
+    <h3>{{ t.context_title }}</h3>
+    {% if sea_state %}
+    <div class="meta-row">
+      <span class="meta-label">{{ t.sea_state_label }}:</span>
+      <span class="meta-value">{{ sea_state }}</span>
+    </div>
+    {% endif %}
+    {% if visibility %}
+    <div class="meta-row">
+      <span class="meta-label">{{ t.visibility_label }}:</span>
+      <span class="meta-value">{{ visibility }}</span>
+    </div>
+    {% endif %}
+    {% if cloud_cover %}
+    <div class="meta-row">
+      <span class="meta-label">{{ t.cloud_cover_label }}:</span>
+      <span class="meta-value">
+        {{ cloud_cover }}/8
+        {% if cloud_cover <= 2 %}({{ t.cloud_clear }}){% elif cloud_cover <= 5 %}({{ t.cloud_partly }}){% else %}({{ t.cloud_overcast }}){% endif %}
+      </span>
+    </div>
+    {% endif %}
+  </main>
+</body>
+</html>

@@ -1,0 +1,9 @@
+version: '3'
+services:
+  logbook:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ~/.logbook:/root/.logbook
+    restart: unless-stopped

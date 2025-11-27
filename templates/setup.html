@@ -1,0 +1,372 @@
+<!-- templates/setup.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+  <meta name="theme-color" content="#1e56a0">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='icons/icon-512.png') }}">
+  
+  <title>Configuración – Diario de a Bordo</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; background: #f9fbfd; }
+    .card { background: white; padding: 1.5rem; border-radius: 8px; margin-bottom: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    label { display: block; margin: 0.8rem 0 0.3rem; font-weight: bold; }
+    input, select { width: 100%; padding: 0.6rem; margin-bottom: 1rem; border: 1px solid #ccc; border-radius: 4px; }
+    button { background: #1e56a0; color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 6px; cursor: pointer; }
+    button:hover { background: #153e75; }
+    .hidden { display: none; }
+    .status { padding: 0.5rem; margin: 0.5rem 0; border-radius: 4px; }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .info { background: #d1ecf1; color: #0c5460; }
+
+    /* Estilos adicionales para separar bloques */
+    .setup-section {
+      padding: 1.2rem;
+      margin-bottom: 1.5rem;
+      border: 1px solid #eee;
+      border-radius: 8px;
+      background: white;
+    }
+    .setup-section h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: #1e56a0;
+      border-bottom: 2px solid #1e56a0;
+      padding-bottom: 0.5rem;
+    }
+    .setup-section p {
+      margin: 0.5rem 0;
+    }
+    .setup-section .flex-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: end;
+    }
+    .setup-section .path-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: 0.5rem;
+    }
+    .setup-section .path-item {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-right: 1rem;
+      margin-bottom: 0.3rem;
+    }
+    .help-text {
+        font-size: 0.9rem;
+        color: #555;
+        margin: 0.5rem 0 1rem;
+        line-height: 1.5;
+    }
+  </style>
+  
+  
+</head>
+<body>
+  <header style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f9fbfd; border-bottom: 1px solid #eee;">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <img src="{{ url_for('static', filename='icons/logo-derrotero.png') }}" alt="Cuaderno de Bitácora" style="height: 60px; width: auto; object-fit: contain;">
+        <h1 style="margin: 0; font-size: 1.2rem;">{{ t.setup_title }}</h1>
+        <a href="/" title="{{ t.cancel_button }}">
+            <img src="{{ url_for('static', filename='icons/house.svg') }}" alt="Editar" style="width: 36px; height: 36px; vertical-align: middle; padding-left: 0.5rem;">
+         </a>
+  </div>
+  </header>
+  
+  <!-- Bloque 0: Idioma-->
+  <section class="setup-section">
+    <h3>{{ t.language }}</h3>
+    <label>{{ t.language_label }}</label>
+    <select id="language">
+      <option value="es" {{ 'selected' if config.language == 'es' }}>Español</option>
+      <option value="en" {{ 'selected' if config.language == 'en' }}>English</option>
+      <option value="fr" {{ 'selected' if config.language == 'fr' }}>Français</option>
+      <option value="zh" {{ 'selected' if config.language == 'zh' }}>中文</option>
+      <option value="ru" {{ 'selected' if config.language == 'zh' }}>Русский</option>
+      <option value="ja" {{ 'selected' if config.language == 'zh' }}>日本語</option>
+    </select>
+  </section>
+
+  <!-- Bloque 1: Configuración general + Signal K básico -->
+  <section class="setup-section">
+    <h3>{{ t.general_settings }}</h3>
+    <p class="help-text">
+        {{ t.setup_general_help }}
+    </p>
+    <label>{{ t.port_label }}</label>
+    <input type="number" id="port" value="{{ config.port or 8384 }}" min="1024" max="65535">
+
+    <label>
+      <input type="checkbox" id="signalk_enabled" {{ 'checked' if config.signalk.enabled }}>
+      {{ t.signalk_enable }}
+    </label>
+    <div id="signalk-fields" class="{{ 'hidden' if not config.signalk.enabled }}">
+      <label>{{ t.signalk_url_label }}</label>
+      <input type="url" id="signalk_url" value="{{ config.signalk.url }}">
+
+      <div id="access-method">
+        <p>{{ t.access_method_1 }}</p>
+        <button type="button" onclick="requestAccess()">{{ t.access_request_button }}</button>
+        <div id="request-status" class="hidden"></div>
+
+        <p style="margin-top: 1.5rem;">{{ t.access_method_2}}</p>
+        <input type="password" id="signalk_token" placeholder="{{ t.token_label }}" value="{{ config.signalk.token }}">
+        <button type="button" onclick="testConnection()">{{ t.test_connection_button }}</button>
+        <div id="test-status" class="hidden"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Bloque 2: Sincronización de entradas con recursos -->
+  <section class="setup-section" id="sync-section" style="{{ 'display: none;' if not config.signalk.enabled }}">
+    <h3>{{ t.sync_settings }}</h3>
+    <p class="help-text">
+        {{ t.setup_sync_help }}
+    </p>
+    <label>
+      <input type="checkbox" id="sync_resources" {{ 'checked' if config.signalk.sync_resources }}>
+      {{ t.signalk_sync_resources }}
+    </label>
+    <div id="sync-types" class="{{ 'hidden' if not config.signalk.sync_resources }}">
+      <label>{{ t.signalk_sync_types }}</label>
+      <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+        {% for type in ['log', 'maintenance', 'weather', 'navigation', 'fuel', 'radio', 'provision', 'other'] %}
+        <label style="display: flex; align-items: center; gap: 0.3rem;">
+          <input type="checkbox" name="sync_type" value="{{ type }}" 
+                 {{ 'checked' if type in config.signalk.sync_entry_types }}>
+          {{ t['entry_type_' + type] }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- Bloque 3: Selección de paths de Signal K -->
+  <section class="setup-section" id="paths-section" style="{{ 'display: none;' if not config.signalk.enabled }}">
+    <h3>{{ t.paths_settings }}</h3>
+    <p class="help-text">
+        {{ t.setup_paths_help }}
+    </p>
+    <label>{{ t.signalk_selected_paths }}</label>
+    <div id="current-paths" class="path-list">
+      {% for path in config.signalk.get('selected_paths', []) %}
+      <label class="path-item">
+        <input type="checkbox" name="selected_path" value="{{ path }}" checked>
+        {{ path }}
+      </label>
+      {% endfor %}
+    </div>
+
+    <div class="flex-row">
+      <input type="text" id="new_path" placeholder="ej: navigation.courseRhumbline" style="flex: 1;">
+      <button type="button" onclick="addPath()">{{ t.add_button }}</button>
+    </div>
+    <div id="path-status" class="status hidden" style="margin-top: 0.5rem;"></div>
+  </section>
+  
+    <!--Bloque 4: Sección Backup -->
+    <section class="setup-section" id="backup-section">
+        <h3>{{ t.backup_settings }}</h3>
+        <p class="help-text">
+            {{ t.setup_backup_help }}
+        </p>
+        <label>
+            <input type="checkbox" id="backup_enabled" name="backup_enabled" {% if config.backup_enabled %}checked{% endif %}>
+            {{ t.enable_backup }}
+        </label>
+        <label>
+            {{ t.backup_path }}:
+            <input type="text" id="backup_path" name="backup_path" value="{{ config.backup_path or '' }}" placeholder="/media/user/usb-backup">
+        </label>
+        <p style="font-size:0.85rem;color:#666">{{ t.backup_path_help }}</p>
+    </section>
+
+  <div style="margin-top: 1.5rem; display: flex; gap: 1rem; justify-content: center;">
+    <button onclick="saveAndFinish()" class="secondary">{{ t.finish_setup_button }}</button>
+    <button onclick="cancelSetup()" class="outline">{{ t.cancel_setup_button }}</button>
+  </div>
+
+  <script>
+    // Mostrar/ocultar secciones según Signal K
+    document.getElementById("signalk_enabled").onchange = function() {
+      const enabled = this.checked;
+      document.getElementById("signalk-fields").classList.toggle("hidden", !enabled);
+      document.getElementById("sync-section").style.display = enabled ? "block" : "none";
+      document.getElementById("paths-section").style.display = enabled ? "block" : "none";
+    };
+
+    // Control del checkbox de sincronización
+    document.getElementById("sync_resources").onchange = function() {
+      document.getElementById("sync-types").classList.toggle("hidden", !this.checked);
+    };
+
+    function showStatus(id, message, isError = false) {
+      const el = document.getElementById(id);
+      el.textContent = message;
+      el.className = isError ? "status error" : "status success";
+      el.classList.remove("hidden");
+    }
+
+    function requestAccess() {
+      const url = document.getElementById("signalk_url").value;
+      if (!url) { alert("Introduce la URL de Signal K"); return; }
+      fetch("/setup/signalk/request", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({url: url})
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showStatus("request-status", "{{ t.access_request_pending }}", false);
+          window.requestHref = data.href;
+          document.getElementById("request-status").innerHTML += 
+            '<br><button onclick="checkAccess()" style="margin-top:0.5rem;">{{ t.access_request_verify }}</button>';
+        } else {
+          showStatus("request-status", "❌ " + data.error, true);
+        }
+      });
+    }
+
+    function checkAccess() {
+      const url = document.getElementById("signalk_url").value;
+      fetch("/setup/signalk/check", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({url: url, href: window.requestHref})
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          showStatus("request-status", "{{t.access_status_ok}}", false);
+          document.getElementById("signalk_token").value = data.token;
+        } else {
+          if (data.state === "PENDING") {
+            showStatus("request-status", "{{t.access_status_pending}}", false);
+          } else {
+            showStatus("request-status", "❌ " + (data.error || "Error desconocido"), true);
+          }
+        }
+      });
+    }
+
+    function testConnection() {
+      const url = document.getElementById("signalk_url").value;
+      const token = document.getElementById("signalk_token").value;
+      if (!url || !token) { alert("URL y token son necesarios"); return; }
+      fetch("/setup/signalk/test", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({url: url, token: token})
+      })
+      .then(r => r.json())
+      .then(data => {
+        showStatus("test-status", data.success ? "✅ Conexión exitosa" : "❌ " + data.error, !data.success);
+      });
+    }
+
+    function addPath() {
+      const newPath = document.getElementById("new_path").value.trim();
+      if (!newPath) {
+        showPathStatus("{{ t.path_empty }}", true);
+        return;
+      }
+      const url = document.getElementById("signalk_url").value;
+      const token = document.getElementById("signalk_token").value;
+      if (!url || !token) {
+        showPathStatus("{{ t.signalk_not_ready }}", true);
+        return;
+      }
+      const testUrl = `${url}/signalk/v1/api/vessels/self/${newPath.replace(/\./g, '/')}`;
+      fetch("/setup/signalk/test-path", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({url: testUrl, token: token})
+      })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const container = document.getElementById("current-paths");
+          const label = document.createElement("label");
+          label.className = "path-item";
+          label.innerHTML = `
+            <input type="checkbox" name="selected_path" value="${newPath}" checked>
+            ${newPath}
+          `;
+          container.appendChild(label);
+          document.getElementById("new_path").value = "";
+          showPathStatus("✅ {{ t.path_added }}", false);
+        } else {
+          showPathStatus("❌ " + data.error, true);
+        }
+      })
+      .catch(err => {
+        console.error(err);
+        showPathStatus("⚠️ {{ t.error_network }}", true);
+      });
+    }
+
+    function showPathStatus(message, isError) {
+      const el = document.getElementById("path-status");
+      el.textContent = message;
+      el.className = isError ? "status error" : "status success";
+      el.classList.remove("hidden");
+    }
+    
+    function cancelSetup() {
+        if (confirm("{{ t.confirm_cancel_setup }}")) {
+            window.location.href = "/"; // ← vuelve al diario
+        }
+    }
+
+    function saveAndFinish() {
+        const selected_paths = Array.from(document.querySelectorAll('input[name="selected_path"]:checked'))
+                                        .map(cb => cb.value);
+        
+        // ✅ Añadir los nuevos campos de backup
+        const backupEnabled = document.getElementById("backup_enabled")?.checked || false;
+        const backupPath = document.getElementById("backup_path")?.value.trim() || "";
+
+        const config = {
+            port: parseInt(document.getElementById("port").value),
+            language: document.getElementById("language").value,
+            signalk_enabled: document.getElementById("signalk_enabled").checked,
+            signalk_url: document.getElementById("signalk_url").value,
+            signalk_token: document.getElementById("signalk_token").value,
+            signalk_sync_resources: document.getElementById("sync_resources").checked,
+            signalk_sync_entry_types: Array.from(document.querySelectorAll('input[name="sync_type"]:checked'))
+                                        .map(cb => cb.value),
+            signalk_selected_paths: selected_paths,
+            
+            // ✅ Campos nuevos: backup
+            backup_enabled: backupEnabled,
+            backup_path: backupPath
+            //console.log("backup_enabled:", backupEnabled);
+            //console.log("backup_path:", backupPath);
+        };
+
+        fetch("/setup/save", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify(config)
+        })
+        .then(() => {
+            window.location.href = "/";
+        })
+        .catch(err => {
+            console.error("Error al guardar configuración:", err);
+            alert("Error al guardar. Revisa la consola del navegador.");
+        });
+        }
+  </script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+# Entornos virtuales
+venv/
+.env
+.env.local
+
+# Archivos de Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.ipynb_checkpoints
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Datos personales
+.bitacora/
+
+# Logs y respaldos locales
+*.log
+*.zip
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo

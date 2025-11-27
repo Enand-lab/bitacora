@@ -1,0 +1,13 @@
+{
+  "port": 8384,
+  "language": "es",
+  "setup_completed": false,
+  "signalk": {
+    "enabled": false,
+    "url": "",
+    "token": "",
+    "sync_resources": true,
+    "sync_entry_types": ["log", "navigation", "weather"],
+    "selected_paths": ["navigation.position", "navigation.state"]
+  }
+}

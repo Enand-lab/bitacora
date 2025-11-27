@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="es">
+<style>
+  .entry {
+    border-bottom: 1px solid #eee;
+    padding: 1.2rem 0;
+  }
+  .entry-time {
+    font-size: 0.85rem;
+    color: #666;
+  }
+  .entry-text {
+    font-size: 1.1rem;
+    margin: 0.4rem 0;
+    line-height: 1.4;
+  }
+  .entry-meta {
+    font-size: 0.9rem;
+    color: #555;
+  }
+  .entry-meta span {
+    margin-right: 1rem;
+  }
+  
+  /* Filtros por origen (más destacados) */
+  .source-filter {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    background: #f0f5ff;
+    color: #2c5aa0;
+    border: 1px solid #d0e0ff;
+    transition: all 0.2s;
+  }
+  .source-filter.active {
+    background: #1e56a0;
+    color: white;
+    border-color: #1e56a0;
+  }
+  .source-filter:hover {
+    background: #e0eaff;
+  }
+  .source-filter.active:hover {
+    background: #1a4a8a;
+  }
+
+  /* Chips de categoría (más discretos) */
+  .category-chip {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    text-decoration: none;
+    background: #f3f4f6;
+    color: #4b5563;
+    white-space: nowrap;
+    transition: background 0.2s;
+  }
+  .category-chip.active {
+    background: #1e56a0;
+    color: white;
+  }
+  .category-chip:hover {
+    background: #e5e7eb;
+  }
+  .category-chip.active:hover {
+    background: #1a4a8a;
+  }
+  
+  
+  .chip {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    text-decoration: none;
+    background: #f0f0f0;
+    color: #333;
+  }
+  .chip.secondary {
+    background: #1e56a0;
+    color: white;
+  }
+  .chip.active {
+    background: #1e56a0;
+    color: white;
+  }
+    .filter-chip {
+    display: inline-block;
+    padding: 0.4rem 0.8rem;
+    margin: 0 0.25rem 0.25rem 0;
+    background: #eef2f7;
+    color: #2c3e50;
+    text-decoration: none;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    white-space: nowrap;
+  }
+  .filter-chip.active {
+    background: #1e56a0;
+    color: white;
+  }
+  
+  
+  
+  /* Estilos para contenido Markdown */
+    .entry-text p {
+        margin: 0.5rem 0;
+        line-height: 1.5;
+    }
+    .entry-text ul,
+    .entry-text ol {
+        margin: 0.5rem 0 0.5rem 1.5rem;
+        padding: 0;
+    }
+    .entry-text li {
+        margin: 0.25rem 0;
+        line-height: 1.4;
+    }
+    .entry-text h1,
+    .entry-text h2,
+    .entry-text h3 {
+        margin: 1rem 0 0.5rem;
+        font-weight: bold;
+    }
+    .entry-text blockquote {
+        margin: 0.5rem 0;
+        padding: 0.5rem 1rem;
+        border-left: 4px solid #ddd;
+        color: #666;
+        font-style: italic;
+    }
+    .entry-text code {
+        background: #f4f4f4;
+        padding: 0.1rem 0.3rem;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 0.9em;
+    }
+  
+  
+  
+  
+  .entry:nth-child(odd) {
+        background: #fafafa;
+        border-left: 4px solid #1e56a0;
+        padding: 1.2rem 1rem;
+    }
+    .entry:nth-child(even) {
+        background: white;
+        border-left: 4px solid transparent;
+        padding: 1.2rem 1rem;
+    }
+    .entry {
+        border-bottom: 1px solid #eee;
+        padding: 1.2rem 0;
+        transition: box-shadow 0.2s ease;
+    }
+    .entry:hover {
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        border-left: 4px solid #1e56a0;
+    }
+    
+    .icon-btn {
+        background-color: #3a78c2;        /* Azul más claro que #1e56a0 */
+        color: black;                     /* Icono en negro */
+        border: 1px solid #2b66a8;        /* Borde ligeramente más oscuro */
+        padding: 0.4rem 0.6rem;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    .icon-btn:hover {
+        background-color: #4a8ad9;        /* Aún más claro al pasar el ratón */
+    }
+    
+</style>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+  <meta name="theme-color" content="#1e56a0">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='icons/icon-512.png') }}">
+  
+  <title>{{ t.app_title }}</title>
+  <style>/* tus estilos móviles */</style>
+</head>
+<body>
+    <header style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f9fbfd; border-bottom: 1px solid #eee;">
+        <div style="display: flex; align-items: center; gap: 0.6rem;">
+            <img src="{{ url_for('static', filename='icons/logo-derrotero.png') }}"
+                alt="Cuaderno de Bitácora"
+                style="height: 60px; width: auto; object-fit: contain;">
+            <h1 style="margin: 0; font-size: 1.2rem;">{{ t.app_title }}</h1>
+        
+            <a href="/setup" title="Configuración" style="font-size: 1.2rem;">
+                <img src="{{ url_for('static', filename='icons/settings.svg') }}" alt="Editar" style="width: 36px; height: 36px; vertical-align: middle; padding-left: 0.5rem;">
+            </a>
+        </div>
+    </header>
+    <main class="container">
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <button onclick="window.location='/api/entry/new'" class="primary">📝 {{ t.full_entry }}</button>
+            <button onclick="quickNote()" class="primary">➕ {{ t.quick_note }}</button>
+            {% if config.backup_enabled %}
+                <button onclick="createBackup()" class="outline">{{ t.create_backup }}</button>
+            {% endif %}
+        </div>
+        <!-- 🔹 Filtro por origen (manual / automático) -->
+        <div style="margin: 1rem 0;">
+        <div style="font-size: 0.85rem; color: #666; margin-bottom: 0.5rem;">{{ t.filter_by_source }}:</div>
+        <h4>{{ t.title_filter_type}}</h4>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <a href="/{{ '?type=' + current_entry_type if current_entry_type else '' }}" 
+            class="source-filter {{ 'active' if not current_source }}">{{ t.filter_all }}</a>
+            <a href="/?source=manual{{ '&type=' + current_entry_type if current_entry_type else '' }}" 
+            class="source-filter {{ 'active' if current_source == 'manual' }}">{{ t.filter_manual }}</a>
+            <a href="/?source=auto{{ '&type=' + current_entry_type if current_entry_type else '' }}" 
+            class="source-filter {{ 'active' if current_source == 'auto' }}">{{ t.filter_auto }}</a>
+        </div>
+        </div>
+
+        <!-- 🔸 Filtro por categoría -->
+        <div style="margin: 1.5rem 0;">
+        <h4>{{ t.title_filter_category }}</h4>
+        <div style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+            <a href="/{{ '?source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if not current_entry_type }}">{{ t.filter_all }}</a>
+            <a href="/?type=experience{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'experience' }}">{{ t.entry_type_experience }}</a>
+            <a href="/?type=log{{ '&source=' + current_source if current_source else '' }}"            
+            class="category-chip {{ 'active' if current_entry_type == 'log' }}">{{ t.entry_type_log }}</a>
+            <a href="/?type=maintenance{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'maintenance' }}">{{ t.entry_type_maintenance }}</a>
+            <a href="/?type=weather{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'weather' }}">{{ t.entry_type_weather }}</a>
+            <a href="/?type=navigation{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'navigation' }}">{{ t.entry_type_navigation }}</a>
+            <a href="/?type=fuel{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'fuel' }}">{{ t.entry_type_fuel }}</a>
+            <a href="/?type=radio{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'radio' }}">{{ t.entry_type_radio }}</a>
+            <a href="/?type=provision{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'provision' }}">{{ t.entry_type_provision }}</a>
+            <a href="/?type=other{{ '&source=' + current_source if current_source else '' }}" 
+            class="category-chip {{ 'active' if current_entry_type == 'other' }}">{{ t.entry_type_other }}</a>
+        </div>
+        </div>
+
+        <div id="entries">
+            {% for e in entries %}
+            <div class="entry" data-id="{{ e.id }}">
+                <div class="entry-time">
+                    <small>{{ e.timestamp_utc[:10] }} {{ e.timestamp_utc[11:16] }} {{ t.utc_time }}</small>
+                </div>
+                <div class="entry-text">
+                    <div>{{ e.text_html | safe }}</div>
+                </div>
+                <div class="entry-meta">
+                    {% if e.latitude and e.longitude %}
+                    <small>📍 {{ "%.4f" % e.latitude }}, {{ "%.4f" % e.longitude }}</small>
+                    {% endif %}
+                    {% if e.navigation_state %}
+                    <small>⛵ {{ e.navigation_state }}</small>
+                    {% endif %}
+                </div>
+                {% if e.media_path %}
+                    <div style="margin-top: 0.5rem;">
+                        <img src="/{{ e.media_path }}" alt="Adjunto" style="max-width: 100%; height: auto; max-height: 200px; border-radius: 4px;">
+                    </div>
+                {% endif %}
+                <div class="entry-actions" style="text-align: right; margin-top: 0.5rem">
+                    <button class="icon-btn" onclick="editEntry({{e.id}})">
+                        <img src="{{ url_for('static', filename='icons/square-pen.svg') }}" alt="Editar" style="width: 18px; height: 18px; vertical-align: middle;">
+                    </button>
+                    <button class="icon-btn" onclick="viewEntry({{ e.id }})">
+                        <img src="{{ url_for('static', filename='icons/eye.svg') }}" alt="Editar" style="width: 18px; height: 18px; vertical-align: middle;">
+                    </button>
+                    <button class="icon-btn" onclick="deleteEntry({{e.id}})">
+                        <img src="{{ url_for('static', filename='icons/trash-2.svg') }}" alt="Editar" style="width: 18px; height: 18px; vertical-align: middle;">
+                    </button>
+                </div>
+            </div>
+            {% else %}
+            <p>{{ t.no_entries }}</p>
+            {% endfor %}
+        </div>
+    </main>
+    <!-- Botón flotante para volver arriba -->
+    <div id="back-to-top" 
+        onclick="scrollToTop()" 
+        style="position: fixed; 
+                bottom: 20px; 
+                right: 20px; 
+                width: 50px; 
+                height: 50px; 
+                border-radius: 50%; 
+                background: #1e56a0; 
+                color: white; 
+                display: flex; 
+                align-items: center; 
+                justify-content: center; 
+                font-size: 1.4rem; 
+                box-shadow: 0 2px 6px rgba(0,0,0,0.2); 
+                cursor: pointer; 
+                opacity: 0; 
+                visibility: hidden; 
+                transition: opacity 0.3s, visibility 0.3s; 
+                z-index: 1000;">
+        ⬆️
+    </div>
+
+    <script>
+    function createBackup() {
+        if (!confirm("{{ t.confirm_backup }}")) return;
+        fetch("/api/backup", { method: "POST" })
+            .then(r => r.json())
+            .then(data => {
+                if (data.status === "ok") {
+                    alert("✅ {{ t.backup_success }}\n" + data.file);
+                    window.location.reload();
+                } else {
+                    alert("❌ {{ t.backup_failed }}: " + data.error);
+                }
+            });
+        }
+    </script>
+
+  <script>
+    // Mostrar/ocultar botón según scroll
+    const backToTopButton = document.getElementById('back-to-top');
+
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 300) {
+            backToTopButton.style.opacity = '0.9';
+            backToTopButton.style.visibility = 'visible';
+        } else {
+            backToTopButton.style.opacity = '0';
+            backToTopButton.style.visibility = 'hidden';
+        }
+    });
+
+    // Scroll suave al inicio
+    function scrollToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    }
+  </script>
+  <script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/sw.js')
+            .then(reg => console.log('✅ SW registrado:', reg.scope))
+            .catch(err => console.log('❌ Error en SW:', err));
+        });
+    }
+  </script>
+  
+  <script>
+    
+    let currentPage = 1;
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentType = urlParams.get('type') || '';
+    const currentSource = urlParams.get('source') || '';
+
+    function loadMoreEntries(page) {
+        const params = new URLSearchParams();
+        if (currentType) params.set('type', currentType);
+        if (currentSource) params.set('source', currentSource);
+        params.set('page', page);
+
+        fetch(`/api/entries?${params.toString()}`)
+            .then(res => res.json())
+            .then(entries => {
+                if (entries.length === 0) {
+                    window.removeEventListener('scroll', onScroll);
+                    const end = document.createElement('div');
+                    end.textContent = '✅ No hay más entradas';
+                    end.style.textAlign = 'center';
+                    end.style.padding = '1rem';
+                    end.style.color = '#666';
+                    document.getElementById('entries').appendChild(end);
+                    return;
+                }
+
+                entries.forEach(e => {
+                    const div = document.createElement('div');
+                    div.className = 'entry';
+                    div.dataset.id = e.id;
+
+                    // Formatear fecha
+                    const date = new Date(e.timestamp_utc);
+                    const dateStr = date.toLocaleDateString() + ' ' + 
+                                    date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                    let meta = '';
+                    if (e.latitude && e.longitude) {
+                        meta += `<small>📍 ${e.latitude.toFixed(4)}, ${e.longitude.toFixed(4)}</small> `;
+                    }
+                    if (e.navigation_state) {
+                        meta += `<small>⛵ ${e.navigation_state}</small>`;
+                    }
+
+                    const img = e.media_path 
+                        ? `<div style="margin-top:0.5rem;"><img src="/${e.media_path}" alt="Adjunto" style="max-width:100%;height:auto;max-height:200px;border-radius:4px;"></div>`
+                        : '';
+
+                    div.innerHTML = `
+                        <div class="entry-time"><small>${dateStr} UTC</small></div>
+                        <div class="entry-text"><p>${e.text || "[Sin texto]"}</p></div>
+                        <div class="entry-meta">${meta}</div>
+                        ${img}
+                        <div class="entry-actions" style="text-align:right;margin-top:0.5rem">
+                            <button class="secondary" onclick="editEntry(${e.id})">✏️</button>
+                            <button class="secondary" onclick="viewEntry(${e.id})">👁️</button>
+                            <button class="secondary" onclick="deleteEntry(${e.id})">🗑️</button>
+                        </div>
+                    `;
+                    document.getElementById('entries').appendChild(div);
+                });
+            })
+            .catch(err => {
+                console.error("Error cargando más entradas:", err);
+            });
+    }
+
+    function onScroll() {
+        const { scrollTop, clientHeight, scrollHeight } = document.documentElement;
+        if (scrollTop + clientHeight >= scrollHeight - 200) {
+            window.removeEventListener('scroll', onScroll); // evitar múltiples llamadas
+            currentPage++;
+            loadMoreEntries(currentPage);
+            // Volver a escuchar después de un breve delay
+            setTimeout(() => window.addEventListener('scroll', onScroll), 500);
+        }
+    }
+
+    // Iniciar scroll infinito solo si hay entradas
+    if (document.querySelectorAll('.entry').length === 50) {
+        window.addEventListener('scroll', onScroll);
+    }
+    
+    function quickNote() {
+      const text = prompt("{{ t.quick_note }}:");
+      if (text) {
+        fetch("/api/quick-note", {
+          method: "POST",
+          headers: {"Content-Type": "application/json"},
+          body: JSON.stringify({text: text})
+        }).then(() => window.location.reload());
+      }
+    }
+      function editEntry(entryId) {
+        window.location = `/api/entry/${entryId}/edit`;
+    }
+
+    function viewEntry(entryId) {
+        // Lo implementaremos a continuación
+        window.location = `/api/entry/${entryId}/view`;
+    }
+    function deleteEntry(entryId) {
+        if (!confirm("{{ t.confirmation_delete }}")) return;
+
+        fetch(`/api/entry/${entryId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Eliminar visualmente
+                const entry = document.querySelector(`[data-id="${entryId}"]`);
+                if (entry) entry.remove();
+            } else {
+                alert("Error al eliminar la entrada");
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            alert("Error de red");
+        });
+    }
+  </script>
+</body>
+</html>

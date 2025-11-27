@@ -1,0 +1,189 @@
+<!-- templates/edit_entry.html -->
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="{{ url_for('static', filename='manifest.webmanifest') }}">
+  <meta name="theme-color" content="#1e56a0">
+  <link rel="icon" type="image/png" sizes="192x192" href="{{ url_for('static', filename='icons/icon-192.png') }}">
+  <link rel="icon" type="image/png" sizes="512x512" href="{{ url_for('static', filename='icons/icon-512.png') }}">
+  
+  <title>{{ t.edit_entry_title }} – {{ t.app_title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pico.min.css') }}">
+  <style>
+    main { max-width: 800px; margin: 0 auto; padding: 1rem 0; }
+    fieldset { margin: 1.5rem 0; padding: 1rem; border-radius: 6px; }
+    legend { font-weight: bold; }
+    .form-footer { margin-top: 1.5rem; text-align: right; }
+    .current-image { margin: 0.5rem 0; }
+    .current-image img { max-width: 100%; max-height: 200px; border-radius: 4px; }
+  </style>
+</head>
+<body>
+  <header style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 1rem; background: #f9fbfd; border-bottom: 1px solid #eee;">
+    <div style="display: flex; align-items: center; gap: 0.6rem;">
+        <img src="{{ url_for('static', filename='icons/logo-derrotero.png') }}" alt="Cuaderno de Bitácora" style="height: 60px; width: auto; object-fit: contain;">
+        <h1 style="margin: 0; font-size: 1.2rem;">{{ t.edit_entry_title }}</h1>
+         <a href="/" title="{{ t.cancel_button }}">
+            <img src="{{ url_for('static', filename='icons/house.svg') }}" alt="Editar" style="width: 36px; height: 36px; vertical-align: middle; padding-left: 0.5rem;">
+         </a>
+    </div>
+    
+    
+  </header>
+  <main class="container">
+    <form id="entryForm" enctype="multipart/form-data">
+      <input type="hidden" name="entry_id" value="{{ entry.id }}">
+
+      <label for="text">{{ t.note_label }} *</label>
+      <textarea id="text" name="text" rows="4" required>{{ entry.text }}</textarea>
+      <div style="margin-top: 0.5rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+        <button type="button" class="outline" onclick="insertMarkdown('**', '**')"><b>B</b></button>
+        <button type="button" class="outline" onclick="insertMarkdown('*', '*')"><i>I</i></button>
+        <button type="button" class="outline" onclick="insertMarkdown('# ', '')">H1</button>
+        <button type="button" class="outline" onclick="insertMarkdown('- ', '')">• Lista</button>
+      </div>
+
+      {% if entry.media_path %}
+      <div class="current-image">
+        <label>{{ t.current_image }}</label>
+        <img src="/{{ entry.media_path }}" alt="Imagen actual">
+        <label>
+          <input type="checkbox" name="remove_image"> {{ t.remove_image }}
+        </label>
+      </div>
+      {% endif %}
+
+      <label for="media_file">{{ t.attach_image }}</label>
+      <input type="file" id="media_file" name="media_file" accept="image/jpeg,image/png">
+      <small>{{ t.image_info }}</small>
+
+      <label for="entry_type">{{ t.entry_type_label }}</label>
+      <select id="entry_type" name="entry_type">
+        <option value="experience">{{ t.entry_type_experience }}</option>
+        <option value="log" {{ 'selected' if entry.entry_type == 'log' }}>{{ t.entry_type_log }}</option>
+        <option value="maintenance" {{ 'selected' if entry.entry_type == 'maintenance' }}>{{ t.entry_type_maintenance }}</option>
+        <option value="weather" {{ 'selected' if entry.entry_type == 'weather' }}>{{ t.entry_type_weather }}</option>
+        <option value="navigation" {{ 'selected' if entry.entry_type == 'navigation' }}>{{ t.entry_type_navigation }}</option>
+        <option value="fuel" {{ 'selected' if entry.entry_type == 'fuel' }}>{{ t.entry_type_fuel }}</option>
+        <option value="radio" {{ 'selected' if entry.entry_type == 'radio' }}>{{ t.entry_type_radio }}</option>
+        <option value="provision" {{ 'selected' if entry.entry_type == 'provision' }}>{{ t.entry_type_provision }}</option>
+        <option value="other" {{ 'selected' if entry.entry_type == 'other' }}>{{ t.entry_type_other }}</option>
+      </select>
+
+      <label for="navigation_state">{{ t.navigation_state_label }}</label>
+      <select id="navigation_state" name="navigation_state">
+        <option value="" {{ 'selected' if not entry.navigation_state }}>{{ t.optional_none }}</option>
+        <option value="moored" {{ 'selected' if entry.navigation_state == 'moored' }}>{{ t.nav_state_moored }}</option>
+        <option value="anchored" {{ 'selected' if entry.navigation_state == 'anchored' }}>{{ t.nav_state_anchored }}</option>
+        <option value="sailing" {{ 'selected' if entry.navigation_state == 'sailing' }}>{{ t.nav_state_sailing }}</option>
+        <option value="motoring" {{ 'selected' if entry.navigation_state == 'motoring' }}>{{ t.nav_state_motoring }}</option>
+      </select>
+
+      <label for="timestamp_utc">{{ t.date_time_label }}</label>
+      <input type="datetime-local" id="timestamp_utc" name="timestamp_utc" value="{{ formatted_timestamp }}" readonly>
+      <small>{{ t.datetime_utc_info }}</small>
+
+      <fieldset>
+        <legend>{{ t.context_title }}</legend>
+        <label for="sea_state">{{ t.sea_state_label }}</label>
+        <select id="sea_state" name="sea_state">
+          <option value="" {{ 'selected' if not metadata.get('sea_state') }}>{{ t.optional_none }}</option>
+          <option value="Calma 0m" {{ 'selected' if metadata.get('sea_state') == 'Calma 0m' }}>{{ t.sea_state_calm_0 }}</option>
+          <option value="Calma ondulada 0m-0.1m" {{ 'selected' if metadata.get('sea_state') == 'Calma ondulada 0m-0.1m' }}>{{ t.sea_state_calm_wavy }}</option>
+          <option value="suave 0.1m-0.5m" {{ 'selected' if metadata.get('sea_state') == 'suave 0.1m-0.5m' }}>{{ t.sea_state_smooth }}</option>
+          <option value="ligero 0.5m-1.25m" {{ 'selected' if metadata.get('sea_state') == 'ligero 0.5m-1.25m' }}>{{ t.sea_state_slight }}</option>
+          <option value="moderado 1.25m-2.5m" {{ 'selected' if metadata.get('sea_state') == 'moderado 1.25m-2.5m' }}>{{ t.sea_state_moderate }}</option>
+          <option value="áspero 2.5m-4m" {{ 'selected' if metadata.get('sea_state') == 'áspero 2.5m-4m' }}>{{ t.sea_state_rough }}</option>
+          <option value="Muy áspero 4m-6m" {{ 'selected' if metadata.get('sea_state') == 'Muy áspero 4m-6m' }}>{{ t.sea_state_very_rough }}</option>
+          <option value="Alto 6m-9m" {{ 'selected' if metadata.get('sea_state') == 'Alto 6m-9m' }}>{{ t.sea_state_high }}</option>
+          <option value="Muy alto 9m-14m" {{ 'selected' if metadata.get('sea_state') == 'Muy alto 9m-14m' }}>{{ t.sea_state_very_high }}</option>
+          <option value="Brutal +14m" {{ 'selected' if metadata.get('sea_state') == 'Brutal +14m' }}>{{ t.sea_state_phenomenal }}</option>
+        </select>
+
+        <label for="visibility">{{ t.visibility_label }}</label>
+        <select id="visibility" name="visibility">
+          <option value="" {{ 'selected' if not metadata.get('visibility') }}>{{ t.optional_none }}</option>
+          <option value="Niebla densa <45m" {{ 'selected' if metadata.get('visibility') == 'Niebla densa <45m' }}>{{ t.vis_dense_fog }}</option>
+          <option value="Niebla espesa <180m" {{ 'selected' if metadata.get('visibility') == 'Niebla espesa <180m' }}>{{ t.vis_thick_dog }}</option>
+          <option value="Niebla <360m" {{ 'selected' if metadata.get('visibility') == 'Niebla <360m' }}>{{ t.vis_fog }}</option>
+          <option value="Niebla moderada <0.5Nm" {{ 'selected' if metadata.get('visibility') == 'Niebla moderada <0.5Nm' }}>{{ t.vis_moderate_fog }}</option>
+          <option value="Niebla fina <1Nm" {{ 'selected' if metadata.get('visibility') == 'Niebla fina <1Nm' }}>{{ t.vis_light_fog }}</option>
+          <option value="Visibilidad pobre <2Nm" {{ 'selected' if metadata.get('visibility') == 'Visibilidad pobre <2Nm' }}>{{ t.vis_poor }}</option>
+          <option value="Visibilidad moderada <5Nm" {{ 'selected' if metadata.get('visibility') == 'Visibilidad moderada <5Nm' }}>{{ t.vis_moderate }}</option>
+          <option value="Buena visibilidad <10Nm" {{ 'selected' if metadata.get('visibility') == 'Buena visibilidad <10Nm' }}>{{ t.vis_good }}</option>
+          <option value="Muy buena visibilidad <30Nm" {{ 'selected' if metadata.get('visibility') == 'Muy buena visibilidad <30Nm' }}>{{ t.vis_very_good }}</option>
+          <option value="Excelente visibilidad +30Nm" {{ 'selected' if metadata.get('visibility') == 'Excelente visibilidad +30Nm' }}>{{ t.vis_excellent }}</option>
+        </select>
+
+        <label for="cloud_cover">{{ t.cloud_cover_label }}</label>
+        <input type="range" id="cloud_cover" name="cloud_cover" min="1" max="8" value="{{ cloud_cover }}">
+        <span id="cloud_cover_value">{{ cloud_cover }}</span>
+      </fieldset>
+
+      <div class="form-footer">
+        <button type="button" onclick="window.location='/'">{{ t.cancel_button }}</button>
+        <button type="submit">{{ t.save_button }}</button>
+      </div>
+    </form>
+  </main>
+  <script>
+        function insertMarkdown(prefix, suffix) {
+            const textarea = document.querySelector('textarea[name="text"]');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const selected = textarea.value.substring(start, end);
+            const newText = prefix + selected + suffix;
+            textarea.value = 
+                textarea.value.substring(0, start) +
+                newText +
+                textarea.value.substring(end);
+            textarea.focus();
+            textarea.setSelectionRange(start + prefix.length, start + prefix.length + selected.length);
+            }
+  </script>
+  <script>
+    const slider = document.getElementById('cloud_cover');
+    const output = document.getElementById('cloud_cover_value');
+    slider.oninput = () => output.textContent = slider.value;
+
+    document.getElementById('entryForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const now = new Date();
+      const utcISO = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().replace(/\.\d+/, '');
+      formData.append('timestamp_utc', utcISO);
+
+      const metadata = {};
+      const sea = formData.get('sea_state');
+      const vis = formData.get('visibility');
+      const cloud = formData.get('cloud_cover');
+      if (sea) metadata.sea_state = sea;
+      if (vis) metadata.visibility = vis;
+      if (cloud) metadata.cloud_cover = parseInt(cloud) || 1;
+      formData.set('metadata', JSON.stringify(metadata));
+
+      formData.delete('sea_state');
+      formData.delete('visibility');
+      formData.delete('cloud_cover');
+
+      try {
+        const res = await fetch('/api/entry/{{ entry.id }}', {
+          method: 'PUT',
+          body: formData
+        });
+        if (res.ok) {
+          window.location = '/';
+        } else {
+          alert('{{ t.error_save }}');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('{{ t.error_network }}');
+      }
+    });
+  </script>
+</body>
+</html>
