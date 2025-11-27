@@ -2,7 +2,8 @@
   <img src="static/icons/logo-derrotero.png" alt="Logo Diario de Bitácora" width="120">
 </p>
 # Cuaderno de Bitácora
-[🇬🇧 English version](docs/en/README.md)
+
+[English version](docs/en/README.md)
 
 > *Un diario de a bordo offline-first, hecho para navegantes que escriben con el corazón y navegan con datos.*
 
