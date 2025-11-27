@@ -139,7 +139,7 @@
     <div id="sync-types" class="{{ 'hidden' if not config.signalk.sync_resources }}">
       <label>{{ t.signalk_sync_types }}</label>
       <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
-        {% for type in ['log', 'maintenance', 'weather', 'navigation', 'fuel', 'radio', 'provision', 'other'] %}
+        {% for type in ['experience','log', 'maintenance', 'weather', 'navigation', 'fuel', 'radio', 'provision', 'other'] %}
         <label style="display: flex; align-items: center; gap: 0.3rem;">
           <input type="checkbox" name="sync_type" value="{{ type }}" 
                  {{ 'checked' if type in config.signalk.sync_entry_types }}>
