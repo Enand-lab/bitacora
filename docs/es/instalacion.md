@@ -10,12 +10,45 @@ Derrotero está diseñado para instalarse en sistemas Linux (Raspberry Pi, NUC, 
 
 ## Pasos
 
-1. **Clona el repositorio** (o copia los archivos en tu máquina).
+### Pasos
+
+1. **Obtén los archivos del proyecto**. Puedes hacerlo de dos formas:
+
+   **Opción A (recomendada si usas Git):**
+   ```bash
+   git clone https://github.com/Enand-lab/bitacora.git ~/src/bitacora
+   ```
+   
+   **Opción B (sin Git, ideal para sistemas mínimos):**
+   ```bash
+   # 1. Crea una carpeta para el proyecto
+    mkdir -p ~/src/bitacora
+
+    # 2. Entra en la carpeta
+    cd ~/src/bitacora
+
+    # 3. Descarga los archivos directamente desde GitHub
+    wget https://github.com/Enand-lab/bitacora/archive/refs/heads/main.tar.gz
+
+    # 4. Descomprime
+    tar -xzf main.tar.gz --strip-components=1
+
+    # 5. Limpia el archivo comprimido
+    rm main.tar.gz
+   ```
+
 2. **Ejecuta el script de instalación**:
 
    ```bash
+   # Entra en la carpeta
+   cd ~/src/bitacora
+   
+   # Dale permisos de ejecución
    chmod +x install.sh
-   ./install.sh```
+   
+   # Ejecuta el script
+   ./install.sh
+   ```
 
     El script:
 
