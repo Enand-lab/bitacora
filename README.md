@@ -1,6 +1,7 @@
 <p align="center">
   <img src="static/icons/logo-derrotero.png" alt="Logo Diario de Bitácora" width="120">
 </p>
+
 # Cuaderno de Bitácora
 
 [English version](docs/en/README.md)
