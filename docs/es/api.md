@@ -1,6 +1,6 @@
 #  API REST — Automatización y acceso programático
 
-**Derrotero expone una API ligera** para interactuar con el diario desde otros sistemas (como Node-RED, scripts, o plugins).  
+**Cuaderno de Bitácora expone una API ligera** para interactuar con el diario desde otros sistemas (como Node-RED, scripts, o plugins).  
 Todos los endpoints devuelven JSON y usan métodos HTTP estándar. No requieren autenticación adicional (asume que se usan en entorno local o LAN privada).
 
 > ⚠️ **Importante**: esta API no está pensada para exponerse a internet. Usa siempre en redes de confianza (como la red local del barco).
