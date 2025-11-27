@@ -40,13 +40,18 @@ sudo apt install -y python3 python3-pip python3-venv avahi-daemon libjpeg-dev zl
 
 # === 2. Clonar o actualizar el repositorio ===
 if [ -d "$APP_DIR" ]; then
-    log "Actualizando repositorio existente..."
-    cd "$APP_DIR" || exit 1
-    git pull
+    if [ -d "$APP_DIR/.git" ]; then
+        log "Actualizando repositorio existente con git pull..."
+        cd "$APP_DIR" || exit 1
+        git pull
+    else
+        log "Carpeta existente sin repositorio Git. Continuando sin actualizar."
+        cd "$APP_DIR" || exit 1
+    fi
 else
     log "Clonando repositorio..."
     mkdir -p "$USER_HOME/src"
-    git clone "https://github.com/Enand-lab/$APP_NAME.git" "$APP_DIR"
+    git clone "https://github.com/Enand-lab/bitacora.git" "$APP_DIR"
     cd "$APP_DIR" || exit 1
 fi
 
