@@ -108,7 +108,7 @@
   "confirm_backup": "Create a backup now?",
   "backup_success": "Backup created successfully:",
   "backup_failed": "Error creating backup",
-  "setup_general_help": "Set language, port, and whether to connect to Signal K. If using Signal K, enter the URL and an access token.",
+  "setup_general_help": "Set language, port, and whether to connect to Signal K. If using Signal K, enter the URL and an access token. Ensure the token has read and write permissions — this is required to publish notes to Signal K resources.",
   "setup_sync_help": "Enable this to automatically publish your entries to Signal K as notes. You can choose which entry types to sync.",
   "setup_paths_help": "Select which Signal K data to include automatically in your entries (e.g., position or navigation state).",
   "setup_backup_help": "Enable manual backup to save your logbook (database, images, and config) to a folder of your choice.",

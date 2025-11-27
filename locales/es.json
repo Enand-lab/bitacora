@@ -121,7 +121,7 @@
   "backup_success": "Copia creada con éxito:",
   "backup_failed": "Error al crear copia",
   
-  "setup_general_help": "Configura el idioma, puerto y si deseas conectar con Signal K. Si usas Signal K, introduce la URL y un token de acceso.",
+  "setup_general_help": "Configura el idioma, puerto y si deseas conectar con Signal K. Si usas Signal K, introduce la URL y un token de acceso. Asegurate de que tenga permiso de lectura y escritura. Imprescindible para poder escribir en resources de Signal-K.",
   "setup_sync_help": "Activa esta opción para que tus entradas se publiquen automáticamente en Signal K como notas. Puedes elegir qué tipos de entradas sincronizar.",
   "setup_paths_help": "Selecciona qué datos de Signal K quieres incluir automáticamente en tus entradas (como posición o estado de navegación).",
   "setup_backup_help": "Habilita la copia de seguridad manual para guardar tu diario (base de datos, imágenes y configuración) en una carpeta de tu elección.",

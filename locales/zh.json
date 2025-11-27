@@ -108,7 +108,7 @@
   "confirm_backup": "现在创建备份吗？",
   "backup_success": "备份已成功创建：",
   "backup_failed": "创建备份时出错",
-  "setup_general_help": "设置语言、端口及是否连接 Signal K。若使用 Signal K，请输入地址和访问令牌。",
+  "setup_general_help": "设置语言、端口及是否连接 Signal K。如果使用 Signal K，请输入 URL 和访问令牌。请确保该令牌具有读写权限——这是向 Signal K 资源写入内容的必要条件。",
   "setup_sync_help": "启用此选项可自动将记录发布为 Signal K 中的笔记。可选择要同步的记录类型。",
   "setup_paths_help": "选择要自动包含在记录中的 Signal K 数据（如位置或航行状态）。",
   "setup_backup_help": "启用手动备份以将您的日志（数据库、图片和配置）保存到自选文件夹。",

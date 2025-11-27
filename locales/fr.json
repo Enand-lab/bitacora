@@ -108,7 +108,7 @@
   "confirm_backup": "Créer une sauvegarde maintenant ?",
   "backup_success": "Sauvegarde créée avec succès :",
   "backup_failed": "Erreur lors de la création de la sauvegarde",
-  "setup_general_help": "Définissez la langue, le port et si vous souhaitez vous connecter à Signal K. Si vous utilisez Signal K, saisissez l’URL et un jeton d’accès.",
+  "setup_general_help": "Définissez la langue, le port et si vous souhaitez vous connecter à Signal K. Si vous utilisez Signal K, saisissez l’URL et un jeton d’accès. Assurez-vous que ce jeton ait les permissions de lecture et d’écriture — c’est indispensable pour écrire dans les ressources de Signal K.",
   "setup_sync_help": "Activez cette option pour publier automatiquement vos entrées dans Signal K en tant que notes. Vous pouvez choisir quels types d’entrées synchroniser.",
   "setup_paths_help": "Sélectionnez quelles données Signal K inclure automatiquement dans vos entrées (ex: position ou état de navigation).",
   "setup_backup_help": "Activez la sauvegarde manuelle pour enregistrer votre carnet (base de données, images et configuration) dans un dossier de votre choix.",
