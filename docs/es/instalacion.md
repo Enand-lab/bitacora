@@ -1,6 +1,6 @@
 # Guía de instalación
 
-Derrotero está diseñado para instalarse en sistemas Linux (Raspberry Pi, NUC, etc.) mediante un script automatizado.
+Cuaderno de Bitácora está diseñado para instalarse en sistemas Linux (Raspberry Pi, NUC, etc.) mediante un script automatizado.
 
 ## Requisitos
 
