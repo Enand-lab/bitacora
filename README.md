@@ -1,7 +1,8 @@
 <p align="center">
   <img src="static/icons/logo-derrotero.png" alt="Logo Diario de Bitácora" width="120">
 </p>
-# Cuaderno de Bitácora [docs/en/README.en.md](English version)
+# Cuaderno de Bitácora
+[🇬🇧 English version](docs/en/README.md)
 
 > *Un diario de a bordo offline-first, hecho para navegantes que escriben con el corazón y navegan con datos.*
 
@@ -54,7 +55,7 @@ Sin embargo:
 ¿Quieres integrar Diario de Bitácora con **Node-RED**, scripts personalizados o sistemas externos?  
 Disponemos de una **API REST ligera** para crear, consultar, editar o borrar entradas, e incluso generar copias de seguridad desde otro sistema.
 
-➡️ **Documentación completa de la API**: [docs/es/api.md](docs/api.md)
+➡️ **Documentación completa de la API**: [docs/es/api.md](docs/es/api.md)
 
 ---
 
@@ -62,7 +63,7 @@ Disponemos de una **API REST ligera** para crear, consultar, editar o borrar ent
 
 Usamos un **script de instalación sencillo** (`install.sh`) que configura todo automáticamente en tu Raspberry Pi o Linux: entorno virtual, servicio systemd, nombre `.local`, directorios de datos, etc.
 
-➡️ **Guía detallada de instalación**: [docs/es/instalacion.md](docs/instalacion.md)
+➡️ **Guía detallada de instalación**: [docs/es/instalacion.md](docs/es/instalacion.md)
 
 ---
 
