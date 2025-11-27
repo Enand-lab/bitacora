@@ -71,6 +71,19 @@ Cuaderno de Bitácora está diseñado para instalarse en sistemas Linux (Raspber
 
 >    Nota: el puerto por defecto es 5000, pero puedes cambiarlo en /setup. 
 
+5. **Desinstalación (opcional)**
+
+   Si en el futuro deseas eliminar Cuaderno de Bitácora:
+
+   ```bash
+   # 1. Dale permisos de ejecución al script de desinstalación
+   chmod +x uninstall.sh
+
+   # 2. Ejecútalo desde la carpeta del proyecto
+   ./uninstall.sh
+   ```
+   El script te preguntará antes de borrar tus entradas, imágenes y configuración.
+   Puedes elegir conservar tus datos personales si lo prefieres.
 
 
 ### Personalización del script 

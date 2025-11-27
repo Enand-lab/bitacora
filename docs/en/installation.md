@@ -65,7 +65,23 @@ The script will:
     - Signal K connection (optional)
     - Backup configuration (optional)
 
-Note: the default port is 5000, but you can change it during or after installation via /setup.
+> Note: the default port is 5000, but you can change it during or after installation via /setup.
+
+5. **Uninstallation (optional)**
+
+   If you ever want to remove Logbook:
+
+   ```bash
+   # 1. Make the uninstall script executable
+   chmod +x uninstall.sh
+
+   # 2. Run it from the project folder
+   ./uninstall.sh
+   ```
+   The script will ask before deleting your entries, images, and configuration.
+   You can choose to keep your personal data if you wish. 
+ 
+
 
 ## Customizing the script
 
