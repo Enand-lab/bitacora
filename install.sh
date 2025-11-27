@@ -38,7 +38,7 @@ log "Instalando dependencias del sistema..."
 sudo apt update
 sudo apt install -y python3 python3-pip python3-venv avahi-daemon libjpeg-dev zlib1g-dev
 
-# === 2. Clonar o actualizar el repositorio ===
+# === 2. Obtener código (clonar o usar si ya está) ===
 if [ -d "$APP_DIR" ]; then
     if [ -d "$APP_DIR/.git" ]; then
         log "Actualizando repositorio existente con git pull..."
@@ -49,7 +49,7 @@ if [ -d "$APP_DIR" ]; then
         cd "$APP_DIR" || exit 1
     fi
 else
-    log "Clonando repositorio..."
+    log "Clonando repositorio desde GitHub..."
     mkdir -p "$USER_HOME/src"
     git clone "https://github.com/Enand-lab/bitacora.git" "$APP_DIR"
     cd "$APP_DIR" || exit 1
@@ -57,7 +57,7 @@ fi
 
 # === 3. Preguntar por el puerto ===
 DEFAULT_PORT=5000
-read -p "¿En qué puerto quieres que escuche el Cuaderno de Bitácora? (por defecto: $DEFAULT_PORT): " USER_PORT
+read -p "¿En qué puerto quieres que escuche Cuaderno de Bitácora? (por defecto: $DEFAULT_PORT): " USER_PORT
 PORT=${USER_PORT:-$DEFAULT_PORT}
 
 # Validar que sea un número y esté en rango válido
@@ -75,13 +75,12 @@ python3 -m venv "$VENV_DIR"
 "$VENV_DIR/bin/pip" install -r requirements.txt
 success "Dependencias Python instaladas."
 
-# === 5. Directorio de datos y configuración inicial ===
+# === 5. Directorio de datos y configuración inicial (¡siempre sobrescribe el puerto!) ===
 log "Preparando directorio de datos en $DATA_DIR..."
 mkdir -p "$DATA_DIR/uploads/deleted"
 
-CONFIG_FILE="$DATA_DIR/config.json"
-if [ ! -f "$CONFIG_FILE" ]; then
-    cat > "$CONFIG_FILE" <<EOF
+# Sobrescribe config.json con el puerto elegido (incluso si ya existe)
+cat > "$DATA_DIR/config.json" <<EOF
 {
   "port": $PORT,
   "language": "es",
@@ -92,21 +91,19 @@ if [ ! -f "$CONFIG_FILE" ]; then
     "enabled": false,
     "url": "",
     "token": "",
-    "sync_resources": false,
+    "sync_resources": true,
     "sync_entry_types": ["log", "navigation", "weather"],
     "selected_paths": ["navigation.position", "navigation.state"]
   }
 }
 EOF
-    log "Configuración inicial creada en $CONFIG_FILE con puerto $PORT"
-fi
-success "Directorio de datos y configuración listos."
+success "Configuración inicial creada en $DATA_DIR/config.json con puerto $PORT"
 
 # === 6. Servicio systemd ===
 log "Creando servicio systemd..."
 sudo tee "$SYSTEMD_PATH" > /dev/null <<EOF
 [Unit]
-Description=Diario de a Bordo ($APP_NAME)
+Description=Cuaderno de Bitácora
 After=network.target
 
 [Service]
@@ -127,16 +124,7 @@ sudo systemctl enable "$SERVICE_NAME"
 sudo systemctl start "$SERVICE_NAME"
 success "Servicio $SERVICE_NAME activado e iniciado."
 
-# === 7. Nombre local (mDNS / Avahi) ===
-log "Configurando nombre local: bitacora.local..."
-if systemctl is-active --quiet avahi-daemon; then
-    success "Avahi ya está activo."
-else
-    sudo systemctl enable --now avahi-daemon
-    success "Avahi iniciado."
-fi
-
-# === 8. Servicio Avahi personalizado ===
+# === 7. Servicio Avahi para bitacora.local ===
 AVAHI_SERVICE="/etc/avahi/services/bitacora.service"
 sudo tee "$AVAHI_SERVICE" > /dev/null <<EOF
 <?xml version="1.0" standalone='no'?><!--*-nxml-*-->
@@ -151,9 +139,9 @@ sudo tee "$AVAHI_SERVICE" > /dev/null <<EOF
 </service-group>
 EOF
 sudo systemctl restart avahi-daemon
-success "Servicio Avahi registrado como 'bitacora.local'"
+success "Nombre local 'bitacora.local' configurado."
 
-# === 9. Instrucciones finales ===
+# === 8. Instrucciones finales ===
 IP=$(hostname -I | awk '{print $1}')
 echo
 success "🎉 ¡Instalación completada!"
